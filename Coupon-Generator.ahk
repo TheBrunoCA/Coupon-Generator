@@ -74,6 +74,10 @@ Update(){
     if config_ini["update", "last_checked", 0] > GetCurrentUnixTime() + (60*30)
         return
 
+    if not IsOnline()
+        return
+    
+    config_ini["update", "last_checked"] := GetCurrentUnixTime()
     github.GetInfo()
     if github.IsUpToDate(version)
         return
@@ -117,11 +121,11 @@ ConfigGui(args*){
     }
     printer_ddl := ConfigGui.AddDropDownList(pt " w150", printer.printers)
     ConfigGui.AddText("ys+20", "Nome do sorteio: ")
-    name_sort_edit := ConfigGui.AddEdit("yp", config_ini["config", "sort_name", "Sorteio"])
     ConfigGui.AddText(, "Descrição curta dos premios: ")
-    prize_name_edit := ConfigGui.AddEdit("yp", config_ini["config", "prize_name", "Diversos prêmios"])
     ConfigGui.AddText(, "Data do sorteio: ")
-    prize_date_edit := ConfigGui.AddEdit("yp", config_ini["config", "prize_date", "xx/xx/xxxx"])
+    name_sort_edit := ConfigGui.AddEdit("ys+20 w150", config_ini["config", "sort_name", "Sorteio"])
+    prize_name_edit := ConfigGui.AddEdit("w150", config_ini["config", "prize_name", "Diversos prêmios"])
+    prize_date_edit := ConfigGui.AddEdit("w150", config_ini["config", "prize_date", "xx/xx/xxxx"])
     cancel_btn := ConfigGui.AddButton("xm", "Cancelar")
     cancel_btn.OnEvent("Click", _Close)
     submit_btn := ConfigGui.AddButton("yp Default", "Salvar")
