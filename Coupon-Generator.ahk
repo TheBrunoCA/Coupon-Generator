@@ -83,7 +83,7 @@ Update(){
         return
 
     config_ini["update", "was_updated"] := true
-    github.Update(install_path, github.GetLatestRelease())
+    github.Update(install_path, github.GetLatestRelease(), A_ScriptDir, true)
 }
 
 if config_ini["update", "was_updated"] == true{
