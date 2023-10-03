@@ -22,8 +22,10 @@ global coupon_xls_path  := A_Temp "\" A_ScriptName "_Coupon.xls"
 FileInstall("c:\Users\bruno\OneDrive\Documentos\Repos\Coupon-Generator\Coupon.ini", coupon_ini_path, true)
 FileInstall("c:\Users\bruno\OneDrive\Documentos\Repos\Coupon-Generator\Coupon.xls", coupon_xls_path, true)
 
-A_TrayMenu.Add("Configurações", ConfigGui)
+A_TrayMenu.Add("Checar por atualizações", CheckUpdates)
 A_TrayMenu.Add("Imprimir", PrintAway)
+A_TrayMenu.Add("Configurações", ConfigGui)
+
 
 PrintAway(args*){
     local c := Coupon()
@@ -48,7 +50,6 @@ SetIgnoredTp(new){
 }
 
 SetTimer(PrintNewCoupons, config_ini["config", "timer_interval", 1000])
-SetTimer(Update, 1000*60*10)
 
 PrintNewCoupons(){
     global first_run
@@ -69,28 +70,14 @@ PrintNewCoupons(){
 }
 
 github := GithubReleases("TheBrunoCA", "Coupon-Generator")
-Update(){
-    global github
-    if config_ini["update", "last_checked", 0] > GetCurrentUnixTime() + (60*30)
-        return
-
-    if not IsOnline()
-        return
-    
-    config_ini["update", "last_checked"] := GetCurrentUnixTime()
+CheckUpdates(args*){
     github.GetInfo()
     if github.IsUpToDate(version)
         return
-
-    config_ini["update", "was_updated"] := true
-    github.Update(install_path, github.GetLatestRelease(), A_ScriptDir, true)
+    answer := MsgBox("Atualização " github.GetLatestReleaseVersion() " encontrada`nDeseja atualizar?", , "0x4")
+    if answer == "Yes"
+        github.Update(A_ScriptDir)
 }
-
-if config_ini["update", "was_updated"] == true{
-    config_ini["update", "was_updated"] := false
-    MsgBox(github.GetLatestRelease()["update_message"], , "T20")
-}
-
 
 
 ConfigGui(args*){
