@@ -5,7 +5,7 @@
 #Include <Bruno-Functions\ImportAllList>
 #Include <GithubReleases\GithubReleases>
 
-global version := "0.0.1"
+global version := "1.0.1"
 
 global sim_temp     := "c:\SIM\TMP\"
 global install_path := NewDir(A_AppData "\TheBrunoCA\Coupons\")
@@ -72,8 +72,10 @@ PrintNewCoupons(){
 github := GithubReleases("TheBrunoCA", "Coupon-Generator")
 CheckUpdates(args*){
     github.GetInfo()
-    if github.IsUpToDate(version)
+    if github.IsUpToDate(version){
+        MsgBox("O aplicativo está atualizado.")
         return
+    }
     answer := MsgBox("Atualização " github.GetLatestReleaseVersion() " encontrada`nDeseja atualizar?", , "0x4")
     if answer == "Yes"
         github.Update(A_ScriptDir)
@@ -82,7 +84,7 @@ CheckUpdates(args*){
 
 ConfigGui(args*){
     SetTimer(PrintNewCoupons, 0)
-    local ConfigGui := Gui()
+    local ConfigGui := Gui(, A_ScriptName " v" version)
     ConfigGui.OnEvent("Close", _Close)
     _Close(args*){
         ConfigGui.Destroy()
