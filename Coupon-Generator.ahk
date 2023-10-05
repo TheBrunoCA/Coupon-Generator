@@ -101,7 +101,9 @@ ConfigGui(args*){
     ConfigGui.AddText("xm", "Tipos de pagamento para ignorar`nSeparado por linhas.")
     ignored_tp_edit := ConfigGui.AddEdit("xm w150 Multi R5", GetIgnoredTp())
     ask_no_matter_value_ckb := ConfigGui.AddCheckbox(, "Mostrar cupom mesmo se o valor não for suficiente.")
+    auto_print_ckb := ConfigGui.AddCheckbox(, "Imprimir cupons diretamente sem preenchimento.")
     ask_no_matter_value_ckb.Value := config_ini["config", "ask_no_matter_value", false]
+    auto_print_ckb.Value := config_ini["config", "auto_print", false]
     ConfigGui.AddText("xm", "Impressora: ")
     pt := ""
     for i, p in printer.printers{
@@ -137,6 +139,7 @@ ConfigGui(args*){
         config_ini["config", "coupon_value"] := coupon_value_edit.Value
         SetIgnoredTp(ignored_tp_edit.Value)
         config_ini["config", "ask_no_matter_value"] := ask_no_matter_value_ckb.Value
+        config_ini["config", "auto_print"] := auto_print_ckb.Value
         config_ini["config", "printer"] := printer_ddl.Text
         config_ini["config", "sort_name"] := name_sort_edit.Value
         config_ini["config", "prize_name"] := prize_name_edit.Value
@@ -159,20 +162,24 @@ PrintGui(coupon){
     local PrintGui := Gui()
     PrintGui    .OnEvent("Close", _Cancel)
     PrintGui    .AddText(, "Nome:")
-    cn := coupon.name == "CONSUMIDOR BALCAO" ? "" : coupon.name
+    cn := (coupon.name == "CONSUMIDOR BALCAO" or config_ini["config", "auto_print", false]) ? "" : coupon.name
     name_edit   := PrintGui.AddEdit("Multi R2 w200", cn)
     PrintGui    .AddText()
     PrintGui    .AddText(, "Número de Telefone:")
-    tel_edit    := PrintGui.AddEdit("Multi R2 w200", coupon.tel)
+    cn := (config_ini["config", "auto_print", false]) ? "" : coupon.tel
+    tel_edit    := PrintGui.AddEdit("Multi R2 w200", cn)
     PrintGui    .AddText()
     PrintGui    .AddText(, "Cidade:")
-    city_edit   := PrintGui.AddEdit("Multi R2 w200", coupon.city)
+    cn := (config_ini["config", "auto_print", false]) ? "" : coupon.city
+    city_edit   := PrintGui.AddEdit("Multi R2 w200", cn)
     PrintGui    .AddText()
     PrintGui    .AddText(, "Bairro:")
-    dist_edit   := PrintGui.AddEdit("Multi R2 w200", coupon.dist)
+    cn := (config_ini["config", "auto_print", false]) ? "" : coupon.dist
+    dist_edit   := PrintGui.AddEdit("Multi R2 w200", cn)
     PrintGui    .AddText()
     PrintGui    .AddText(, "Endereço:")
-    end_edit    := PrintGui.AddEdit("Multi R2 w200", coupon.end)
+    cn := (config_ini["config", "auto_print", false]) ? "" : coupon.end
+    end_edit    := PrintGui.AddEdit("Multi R2 w200", cn)
     PrintGui    .AddText()
     PrintGui    .AddText(, "Valor total: R$" coupon.value)
     cv := config_ini["config", "coupon_value", 50]
@@ -234,7 +241,12 @@ PrintGui(coupon){
     PrintGui    .AddText("yp", "Copias: ")
     copies_edit := PrintGui.AddEdit("yp w30", cqtd)
     
-    PrintGui    .Show()
+    if config_ini["config", "auto_print", false]{
+        _Print()
+    }
+    else{
+        PrintGui    .Show()
+    }
 }
 
 Class Coupon{
