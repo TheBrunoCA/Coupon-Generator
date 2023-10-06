@@ -5,7 +5,7 @@
 #Include <Bruno-Functions\ImportAllList>
 #Include <GithubReleases\GithubReleases>
 
-global version := "1.0.1"
+global version := "1.0.2"
 
 global sim_temp     := "c:\SIM\TMP\"
 global install_path := NewDir(A_AppData "\TheBrunoCA\Coupons\")
@@ -19,8 +19,8 @@ global first_run    := true
 
 global coupon_ini_path  := A_Temp "\" A_ScriptName "_Coupon.ini"
 global coupon_xls_path  := A_Temp "\" A_ScriptName "_Coupon.xls"
-FileInstall("c:\Users\bruno\OneDrive\Documentos\Repos\Coupon-Generator\Coupon.ini", coupon_ini_path, true)
-FileInstall("c:\Users\bruno\OneDrive\Documentos\Repos\Coupon-Generator\Coupon.xls", coupon_xls_path, true)
+FileInstall("c:\Repositorios\Coupon-Generator\Coupon.ini", coupon_ini_path, true)
+FileInstall("c:\Repositorios\Coupon-Generator\Coupon.xls", coupon_xls_path, true)
 
 A_TrayMenu.Add("Checar por atualizações", CheckUpdates)
 A_TrayMenu.Add("Imprimir", PrintAway)
@@ -31,7 +31,10 @@ PrintAway(args*){
     local c := Coupon()
     c.value := config_ini["config", "coupon_value", 50]
     SetTimer(PrintNewCoupons, 0)
+    local auto_print_config := config_ini["config", "auto_print", false]
+    config_ini["config", "auto_print"] := false
     PrintGui(c)
+    config_ini["config", "auto_print"] := auto_print_config
     return
 }
 
