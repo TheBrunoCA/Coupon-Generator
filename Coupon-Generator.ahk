@@ -7,11 +7,24 @@
 
 global version := "1.0.2"
 
+global user := "TheBrunoCA"
+global repo := "Coupon-Generator"
+global github := GithubReleases(user, repo)
+
 global sim_temp     := "c:\SIM\TMP\"
-global install_path := NewDir(A_AppData "\TheBrunoCA\Coupons\")
-global daily_folder := NewDir(install_path A_Year "\" A_Mon "\" A_MDay)
+global install_path := NewDir(A_AppData "\" user "\" repo)
+global version_path := install_path "\version"
+
+try FileDelete(version_path)
+FileAppend(version, version_path)
+
+try FileCopy(A_ScriptFullPath, install_path "\" repo ".exe", true)
+
+global daily_folder := NewDir(install_path "\" A_Year "\" A_Mon "\" A_MDay)
 global cli_sale_log := daily_folder "\cli_sale_log.txt"
 global cli_rec_log  := daily_folder "\cli_rec_log.txt"
+
+
 
 global printer := PrinterHelper()
 
@@ -38,9 +51,9 @@ PrintAway(args*){
     return
 }
 
-global config_ini := Ini(install_path "config.ini")
+global config_ini := Ini(install_path "\config.ini")
 global coupons_ini := Ini(coupon_ini_path)
-global ignored_tp := install_path "ignored_tp.txt"
+global ignored_tp := install_path "\ignored_tp.txt"
 GetIgnoredTp(){
     if FileExist(ignored_tp)
         return FileRead(ignored_tp, "UTF-8")
@@ -72,7 +85,6 @@ PrintNewCoupons(){
     }
 }
 
-github := GithubReleases("TheBrunoCA", "Coupon-Generator")
 CheckUpdates(args*){
     github.GetInfo()
     if github.IsUpToDate(version){
