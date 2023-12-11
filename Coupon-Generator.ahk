@@ -87,7 +87,7 @@ ConfigGui(args*){
     local ConfigGui := Gui(, A_ScriptName " v" version)
     ConfigGui.OnEvent("Close", _Close)
     _Close(args*){
-        ConfigGui.Destroy()
+        try ConfigGui.Destroy()
         SetTimer(PrintNewCoupons, config_ini["config", "timer_interval", 1000])
         return
     }
@@ -144,7 +144,7 @@ ConfigGui(args*){
         config_ini["config", "sort_name"] := name_sort_edit.Value
         config_ini["config", "prize_name"] := prize_name_edit.Value
         config_ini["config", "prize_date"] := prize_date_edit.Value
-        ConfigGui.Destroy()
+        try ConfigGui.Destroy()
         SetTimer(PrintNewCoupons, config_ini["config", "timer_interval", 1000])
         return
     }
@@ -198,7 +198,7 @@ PrintGui(coupon){
     cancel_btn  := PrintGui.AddButton(,"Cancelar")
     cancel_btn  .OnEvent("Click", _Cancel)
     _Cancel(args*){
-        PrintGui.Destroy()
+        try PrintGui.Destroy()
         SetTimer(PrintNewCoupons, config_ini["config", "timer_interval", 1000])
     }
     
@@ -234,7 +234,7 @@ PrintGui(coupon){
         obj.Quit()
         Sleep(1000)
         SetTimer(PrintNewCoupons, config_ini["config", "timer_interval", 1000])
-        PrintGui.Destroy()
+        try PrintGui.Destroy()
         return
     }
     
