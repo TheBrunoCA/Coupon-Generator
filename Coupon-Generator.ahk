@@ -5,13 +5,26 @@
 #Include <Bruno-Functions\ImportAllList>
 #Include <GithubReleases\GithubReleases>
 
-global version := "1.0.1"
+global version := "1.0.2"
+
+global user := "TheBrunoCA"
+global repo := "Coupon-Generator"
+global github := GithubReleases(user, repo)
 
 global sim_temp     := "c:\SIM\TMP\"
-global install_path := NewDir(A_AppData "\TheBrunoCA\Coupons\")
-global daily_folder := NewDir(install_path A_Year "\" A_Mon "\" A_MDay)
+global install_path := NewDir(A_AppData "\" user "\" repo)
+global version_path := install_path "\version"
+
+try FileDelete(version_path)
+FileAppend(version, version_path)
+
+try FileCopy(A_ScriptFullPath, install_path "\" repo ".exe", true)
+
+global daily_folder := NewDir(install_path "\" A_Year "\" A_Mon "\" A_MDay)
 global cli_sale_log := daily_folder "\cli_sale_log.txt"
 global cli_rec_log  := daily_folder "\cli_rec_log.txt"
+
+
 
 global printer := PrinterHelper()
 
@@ -19,8 +32,8 @@ global first_run    := true
 
 global coupon_ini_path  := A_Temp "\" A_ScriptName "_Coupon.ini"
 global coupon_xls_path  := A_Temp "\" A_ScriptName "_Coupon.xls"
-FileInstall("c:\Users\bruno\OneDrive\Documentos\Repos\Coupon-Generator\Coupon.ini", coupon_ini_path, true)
-FileInstall("c:\Users\bruno\OneDrive\Documentos\Repos\Coupon-Generator\Coupon.xls", coupon_xls_path, true)
+FileInstall("c:\Repositorios\Coupon-Generator\Coupon.ini", coupon_ini_path, true)
+FileInstall("c:\Repositorios\Coupon-Generator\Coupon.xls", coupon_xls_path, true)
 
 A_TrayMenu.Add("Checar por atualizações", CheckUpdates)
 A_TrayMenu.Add("Imprimir", PrintAway)
@@ -31,13 +44,16 @@ PrintAway(args*){
     local c := Coupon()
     c.value := config_ini["config", "coupon_value", 50]
     SetTimer(PrintNewCoupons, 0)
+    local auto_print_config := config_ini["config", "auto_print", false]
+    config_ini["config", "auto_print"] := false
     PrintGui(c)
+    config_ini["config", "auto_print"] := auto_print_config
     return
 }
 
-global config_ini := Ini(install_path "config.ini")
+global config_ini := Ini(install_path "\config.ini")
 global coupons_ini := Ini(coupon_ini_path)
-global ignored_tp := install_path "ignored_tp.txt"
+global ignored_tp := install_path "\ignored_tp.txt"
 GetIgnoredTp(){
     if FileExist(ignored_tp)
         return FileRead(ignored_tp, "UTF-8")
@@ -69,7 +85,6 @@ PrintNewCoupons(){
     }
 }
 
-github := GithubReleases("TheBrunoCA", "Coupon-Generator")
 CheckUpdates(args*){
     github.GetInfo()
     if github.IsUpToDate(version){
