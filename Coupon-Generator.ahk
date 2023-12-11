@@ -5,7 +5,7 @@
 #Include <Bruno-Functions\ImportAllList>
 #Include <GithubReleases\GithubReleases>
 
-global version := "1.0.2"
+global version := "1.0.3"
 
 global user := "TheBrunoCA"
 global repo := "Coupon-Generator"
